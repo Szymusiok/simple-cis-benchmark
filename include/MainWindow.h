@@ -4,6 +4,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QList>
+#include <QFont>
 #include "ui_MainWindow.h"
 #include "Test.h"
 #include <vector>
@@ -17,9 +18,9 @@ public:
    ~MainWindow();
 
    //dzialanie
-   void FillTestTree();
+   void BuildTestTree();
+   void ResetTestTree();
    void ManageTest();
-   void ResetTests();
 
    void StartTest();
 private:

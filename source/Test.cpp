@@ -1,8 +1,9 @@
 #include "Test.h"
 
 Test::Test(std::string name, std::string description)
-   : name{name}, description{description},passed{false}
+   : name{name}, description{description}
 {
+   result = Result::Unknown;
 }
 
 Test::~Test()
@@ -10,9 +11,9 @@ Test::~Test()
    this->Clear();
 }
 
-bool Test::IsPassed()
+Test::Result Test::GetResult()
 {
-   return this->passed;
+   return this->result;
 }
 
 std::string Test::GetName()
@@ -20,8 +21,12 @@ std::string Test::GetName()
    return this->name;
 }
 
-void Test::Clear()
+std::string Test::GetDescription()
 {
-   this->name.clear();
-   this->passed = false;
+   return this->description;
+}
+
+void Test::Clear()
+{  
+   this->result = Result::Unknown;
 }

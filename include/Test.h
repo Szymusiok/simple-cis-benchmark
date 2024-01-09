@@ -5,17 +5,24 @@
 class Test
 {
 public:
+   enum class Result
+   {
+      Failed = 0,
+      Success,
+      Unknown
+   };
+
    Test(std::string name, std::string description);
    ~Test();
 
-   bool IsPassed();
+   Result GetResult();
    std::string GetName();
+   std::string GetDescription();
    void Clear();
-
 
 private:
    std::string name;
    std::string description;
-   bool passed;
+   Result result;
 };
 
