@@ -1,4 +1,4 @@
-x64/Debug
+x64/
 #Ignore thumbnails created by Windows
 Thumbs.db
 #Ignore files built by Visual Studio
