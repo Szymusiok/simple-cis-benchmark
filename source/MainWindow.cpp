@@ -32,11 +32,11 @@ void MainWindow::BuildTestTree()
    this->ui.testTree->header()->setDefaultSectionSize(400);
 
    QFont font;
-   font.setPointSize(12);
+   font.setPointSize(13);
    this->ui.testTree->header()->setFont(font);
 
    std::vector < std::string> testNames{"Haslo","Konto","Firewall","Rejestr","Serwisy","Aktualizacja","Dostep"};
-   int passed = 0;
+   int points{}, maxPoints{};
 
    for (int i = 0; i < this->allTests.size(); i++)
    {
@@ -55,7 +55,7 @@ void MainWindow::BuildTestTree()
          {
             item->setText(1, "Success");
             item->setTextColor(1, QColor(0, 128, 0));
-            passed++;
+            points++;
          }
          else if (test->GetResult() == Test::Result::Failed)
          {
@@ -66,6 +66,7 @@ void MainWindow::BuildTestTree()
          {
             item->setText(1, "-");
          }
+         maxPoints++;
 
          item->setToolTip(0,test->GetDescription().c_str());
 
@@ -75,8 +76,8 @@ void MainWindow::BuildTestTree()
          
          mainItem->addChild(item);
       }
-      mainItem->setText(1, std::string(std::to_string(passed)+"/3").c_str());
-      passed = 0;
+      mainItem->setText(1, std::string(std::to_string(points)+"/"+std::to_string(maxPoints)).c_str());
+      points = 0, maxPoints = 0;;
       this->ui.testTree->addTopLevelItem(mainItem);
    }
 }
@@ -160,8 +161,56 @@ void MainWindow::ResetTestTree()
    this->ui.testTree->clear();
 }
 
+void MainWindow::SetResultText()
+{
+   this->ui.resultText->clear();
+
+   QFont font;
+   font.setPointSize(16);
+   this->ui.resultText->setFont(font);
+
+   std::string resultText{"Points: "};
+   int points{}, maxPoints{};
+
+   for (std::vector<Test*> tests : this->allTests)
+   {
+      for (Test* test : tests)
+      {  
+         if (test->GetResult() == Test::Result::Success)
+         {
+            points++;
+         }
+         maxPoints++;
+      }
+   }
+   float percent = static_cast<float>(points) / static_cast<float>(maxPoints) * 100.0f;
+
+   if (percent > 80)
+   {
+      this->ui.resultText->setStyleSheet("background-color: rgb(0, 255, 0);");
+   }
+   else
+   {
+      this->ui.resultText->setStyleSheet("background-color: rgb(255, 0, 0);");
+   }
+
+   resultText += std::to_string(points) + "/" + std::to_string(maxPoints);
+   resultText += "               Percent: ";
+
+   this->ui.resultText->append(resultText.c_str());
+
+   resultText = std::to_string(percent);
+   QString result = QString::number(percent, 'f', 2).arg('%');
+   this->ui.resultText->insertPlainText(result);
+}
+
 void MainWindow::StartTest()
 {
    this->ResetTestTree();
+
+   //tutaj cale testy w jakiejs funkcji
+
+   this->SetResultText();
    this->BuildTestTree();
+
 }

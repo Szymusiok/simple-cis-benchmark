@@ -20,6 +20,7 @@ public:
    //dzialanie
    void BuildTestTree();
    void ResetTestTree();
+   void SetResultText();
    void ManageTest();
 
    void StartTest();
