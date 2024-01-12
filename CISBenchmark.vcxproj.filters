@@ -42,7 +42,7 @@
     <ClCompile Include="source\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestMethods.cpp">
+    <ClCompile Include="source\TestSuite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,5 +50,13 @@
     <ClInclude Include="include\Test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\TestSuite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\logo.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #include "Test.h"
 
-Test::Test(std::string name, std::string description)
-   : name{name}, description{description}
+Test::Test(std::string name, std::string description, std::function<bool()> test)
+   : name{name}, description{description}, test(test)
 {
    result = Result::Unknown;
 }
@@ -29,4 +29,9 @@ std::string Test::GetDescription()
 void Test::Clear()
 {  
    this->result = Result::Unknown;
+}
+
+void Test::Run()
+{
+   this->test() ? this->result = Result::Success : this->result = Result::Failed;
 }

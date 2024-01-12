@@ -12,7 +12,7 @@
 
 #pragma comment(lib, "Netapi32.lib")
 
-size_t Test::GetMinimumPasswordLength()
+bool TestSuite::GetMinimumPasswordLength()
 {
    std::array<char, 256> buffer{};
    std::string result;
@@ -32,14 +32,16 @@ size_t Test::GetMinimumPasswordLength()
    std::smatch match;
    if (std::regex_search(result, match, regex) && match.size() > 1)
    {
-      return std::stoul(match.str(1));
+      
+      return std::stoul(match.str(1)) > 8 ? true : false;
    }
 
    return 0;
 }
 
-size_t Test::GetPasswordExpiredTime()
+bool TestSuite::GetPasswordExpiredTime()
 {
+   bool rV = true;
    wchar_t username[UNLEN + 1];
    DWORD usernameLen = UNLEN + 1;
 
@@ -47,7 +49,7 @@ size_t Test::GetPasswordExpiredTime()
    if (!GetUserName(username, &usernameLen))
    {
       // Obs³u¿ b³¹d, np. zwróæ -1 w przypadku niepowodzenia.
-      return static_cast<size_t>(-1);
+      return false;
    }
 
    USER_INFO_3* userInfo = nullptr;
@@ -58,14 +60,14 @@ size_t Test::GetPasswordExpiredTime()
    if (status != NERR_Success)
    {
       // Obs³u¿ b³¹d, np. zwróæ -1 w przypadku niepowodzenia.
-      return static_cast<size_t>(-1);
+      return false;
    }
 
    // SprawdŸ, czy data wygaœniêcia has³a jest dostêpna.
    if (userInfo->usri3_password_expired)
    {
       // Has³o wygas³o, zwróæ 0 lub inn¹ wartoœæ oznaczaj¹c¹ wygaœniêcie.
-      return 0;
+      return false;
    }
 
    // Pobierz datê wygaœniêcia has³a jako DWORD.
@@ -76,15 +78,13 @@ size_t Test::GetPasswordExpiredTime()
    if (passwordAge <= currentTime)
    {
       // Has³o wygas³o, zwróæ 0 lub inn¹ wartoœæ oznaczaj¹c¹ wygaœniêcie.
-      return 0;
+      return false;
    }
 
-   // Oblicz czas wygaœniêcia has³a w sekundach.
-   DWORD remainingTime = (passwordAge - currentTime) / 1000; // Przeliczamy na sekundy.
-   return static_cast<size_t>(remainingTime);
+   return true;
 }
 
-bool Test::CheckFirewall()
+bool TestSuite::CheckFirewall()
 {
    bool rV = true;
    // Wywo³aj polecenie netsh w trybie wiersza poleceñ
@@ -123,7 +123,7 @@ bool Test::CheckFirewall()
    return rV;
 }
 
-bool Test::CheckRegistryWrite()
+bool TestSuite::CheckRegistryWrite()
 {
    bool rV = true;
 
@@ -160,7 +160,7 @@ bool Test::CheckRegistryWrite()
    return rV;
 }
 
-bool Test::CheckServices()
+bool TestSuite::CheckServices()
 {
    bool rV = true;
 
@@ -225,7 +225,7 @@ bool Test::CheckServices()
    return rV;
 }
 
-bool Test::CheckServiceTriggerStartPermissions()
+bool TestSuite::CheckServiceTriggerStartPermissions()
 {
    // Nazwa us³ugi, której uprawnienia do zmiany trybu automatycznego startu s¹ sprawdzane
    const wchar_t* serviceName = L"wuauserv"; // Us³uga Windows Update
@@ -264,7 +264,7 @@ bool Test::CheckServiceTriggerStartPermissions()
    return false;
 }
 
-bool Test::CheckIfUpdateIsAutomat()
+bool TestSuite::CheckIfUpdateIsAutomat()
 {
    // Nazwa us³ugi, której automatyczny start ma byæ sprawdzony
    const wchar_t* serviceName = L"wuauserv"; // Us³uga Windows Update
@@ -321,7 +321,7 @@ bool Test::CheckIfUpdateIsAutomat()
    return false;
 }
 
-bool Test::CheckFolderAccess()
+bool TestSuite::CheckFolderAccess()
 {
    const wchar_t* folderPath = L"C:\\Windows"; // Œcie¿ka do folderu Windows
 
@@ -338,7 +338,7 @@ bool Test::CheckFolderAccess()
    }
 }
 
-bool Test::CheckFolderPermissions()
+bool TestSuite::CheckFolderPermissions()
 {
    const wchar_t* folderPath = L"C:\\Windows"; // Œcie¿ka do folderu Windows
 
@@ -392,7 +392,7 @@ bool Test::CheckFolderPermissions()
    return false;
 }
 
-bool Test::CheckBitLocker()
+bool TestSuite::CheckBitLocker()
 {
    DWORD dwVolumeStatus;
    if (GetVolumeInformation(L"C:\\", NULL, 0, NULL, NULL, &dwVolumeStatus, NULL, 0))

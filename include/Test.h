@@ -1,6 +1,8 @@
 #pragma once
 
+#include "TestSuite.h"
 #include <string>
+#include <functional>
 
 class Test
 {
@@ -12,39 +14,20 @@ public:
       Unknown
    };
 
-   Test(std::string name, std::string description);
+   Test(std::string name, std::string description, std::function<bool()> test);
    ~Test();
 
    Result GetResult();
    std::string GetName();
    std::string GetDescription();
    void Clear();
+   void Run();
 
-
-   // TEST METHODS
-
-   // PASSWORD
-   size_t GetMinimumPasswordLength(); // GIT
-   size_t GetPasswordExpiredTime();
-
-   bool CheckFirewall();
-
-   bool CheckRegistryWrite();
-   bool CheckServices();
-
-   bool CheckServiceTriggerStartPermissions();
-
-   bool CheckIfUpdateIsAutomat();
-
-   bool CheckFolderAccess();
-
-   bool CheckFolderPermissions();
-
-   bool CheckBitLocker();
 
 private:
    std::string name;
    std::string description;
    Result result;
+   std::function<bool()> test;
 };
 

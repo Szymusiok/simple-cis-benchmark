@@ -68,6 +68,10 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)CISBenchmark\source;$(SolutionDir)CISBenchmark\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
@@ -103,10 +107,14 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\MainWindow.cpp" />
     <ClCompile Include="source\Test.cpp" />
-    <ClCompile Include="TestMethods.cpp" />
+    <ClCompile Include="source\TestSuite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Test.h" />
+    <ClInclude Include="include\TestSuite.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\logo.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
