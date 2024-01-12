@@ -209,6 +209,13 @@ void MainWindow::StartTest()
    this->ResetTestTree();
 
    // TESTY NA SUCHO
+   bool overall = true;
+
+   //HASLO 1
+   size_t siema = 0;
+   this->allTests[0][0]->GetMinimumPasswordLength();
+
+   //HASLO 2
 
 
 

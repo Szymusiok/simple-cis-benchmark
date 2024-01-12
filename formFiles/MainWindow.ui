@@ -38,7 +38,7 @@
       <height>581</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1,0">
+    <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1,0,0">
      <item>
       <widget class="QTreeWidget" name="testTree">
        <attribute name="headerDefaultSectionSize">
@@ -58,6 +58,9 @@
      </item>
      <item>
       <widget class="QTextBrowser" name="resultText"/>
+     </item>
+     <item>
+      <widget class="QPlainTextEdit" name="plainTextEdit"/>
      </item>
      <item>
       <widget class="QPushButton" name="startButton">

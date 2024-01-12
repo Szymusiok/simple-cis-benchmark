@@ -103,6 +103,7 @@
     <ClCompile Include="source\main.cpp" />
     <ClCompile Include="source\MainWindow.cpp" />
     <ClCompile Include="source\Test.cpp" />
+    <ClCompile Include="TestMethods.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Test.h" />

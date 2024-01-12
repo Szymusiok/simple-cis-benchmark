@@ -8,6 +8,7 @@
 #include "ui_MainWindow.h"
 #include "Test.h"
 #include <vector>
+#include <windows.h>
 
 class MainWindow : public QMainWindow
 {

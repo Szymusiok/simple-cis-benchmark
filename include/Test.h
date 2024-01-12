@@ -21,6 +21,12 @@ public:
    void Clear();
 
 
+   // TEST METHODS
+
+   // PASSWORD
+   size_t GetMinimumPasswordLength(); // GIT
+   bool IfPasswordMeetsCriteria();
+
 private:
    std::string name;
    std::string description;
