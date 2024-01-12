@@ -25,7 +25,22 @@ public:
 
    // PASSWORD
    size_t GetMinimumPasswordLength(); // GIT
-   bool IfPasswordMeetsCriteria();
+   size_t GetPasswordExpiredTime();
+
+   bool CheckFirewall();
+
+   bool CheckRegistryWrite();
+   bool CheckServices();
+
+   bool CheckServiceTriggerStartPermissions();
+
+   bool CheckIfUpdateIsAutomat();
+
+   bool CheckFolderAccess();
+
+   bool CheckFolderPermissions();
+
+   bool CheckBitLocker();
 
 private:
    std::string name;

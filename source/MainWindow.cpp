@@ -35,7 +35,7 @@ void MainWindow::BuildTestTree()
    font.setPointSize(13);
    this->ui.testTree->header()->setFont(font);
 
-   std::vector < std::string> testNames{"Haslo","Konto","Firewall","Rejestr","Serwisy","Aktualizacja","Dostep"};
+   std::vector < std::string> testNames{"Haslo","Firewall","Rejestr","Serwisy","Aktualizacja","Dostep","Dysk"};
    int points{}, maxPoints{};
 
    for (int i = 0; i < this->allTests.size(); i++)
@@ -87,66 +87,44 @@ void MainWindow::ManageTest()
    // Password
    Test* password1 = new Test("Minimalna dlugosc hasla", "Sprawdzenie minimalnej dlugosci hasla w systemie");
    this->passwordTests.push_back(password1);
-   Test* password2 = new Test("Typy znakow", "Weryfikacja, czy wymagane sa okreslone typy znakow (np. duze litery, cyfry, znaki specjalne)");
-   this->passwordTests.push_back(password2);
    Test* password3 = new Test("Wygasniecie hasla", "Sprawdzenie czasu wygasniecia hasla");
    this->passwordTests.push_back(password3);
 
-   // Accounts
-   Test* accounts1 = new Test("Konta uzytkownika", "Pobranie listy istniejacych kont uzytkownikow i ich typow (administrator, uzytkownik standardowy).");
-   this->accountTests.push_back(accounts1);
-   Test* accounts2 = new Test("Uprawnienia", "Zmiana uprawnien dla okreslonych kont uzytkownikow.");
-   this->accountTests.push_back(accounts2);
-   Test* accounts3 = new Test("Data logowania", "Sprawdzenie daty ostatniego logowania dla kont uzytkownikow.");
-   this->accountTests.push_back(accounts3);
-
    // Firewall
-   Test* firewall1 = new Test("Porty", "Sprawdzenie aktualnych regul zapory sieciowej, aby sprawdzic, czy okreslone porty sa zablokowane lub otwarte.");
-   this->firewallTests.push_back(firewall1);
-   Test* firewall2 = new Test("Reguly", "Dodanie lub usuwanie regul w zaporze sieciowej w zaleznosci od konfiguracji.");
-   this->firewallTests.push_back(firewall2);
    Test* firewall3 = new Test("Stan", "Pobranie informacji o aktualnym stanie zapory sieciowej (wlaczona/wylaczona).");
    this->firewallTests.push_back(firewall3);
 
    // Events
    Test* events1 = new Test("Zapis do rejestru", "Zapisywanie okreslonych zdarzen do rejestru systemowego, np. logowanie do systemu, proby dostepu do chronionych plikow itp.");
    this->eventsTests.push_back(events1);
-   Test* events2 = new Test("Odczyt z rejestru", "Odczytanie i analiza zdarzen w rejestrze systemowym w celu wykrycia okreslonych aktywnosci.");
-   this->eventsTests.push_back(events2);
-   Test* events3 = new Test("Reakcje", "Ustawienie powiadomien lub reakcji na okreslone zdarzenia systemowe.");
-   this->eventsTests.push_back(events3);
 
    // Services
    Test* services1 = new Test("Zarzadzanie uslugami", "Startowanie, zatrzymywanie lub restartowanie okreslonych uslug systemowych.");
    this->servicesTests.push_back(services1);
-   Test* services2 = new Test("Dzialanie uslug", "Sprawdzenie stanu dzialania wybranych uslug systemowych.");
-   this->servicesTests.push_back(services2);
-   Test* services3 = new Test("Autostart", "Ustawienie automatycznego startu/uslugi na zadanie.");
+   Test* services3 = new Test("Autostart", "Ustawienie uprawnien automatycznego startu/uslugi na zadanie.");
    this->servicesTests.push_back(services3);
 
    // Update
-   Test* update1 = new Test("Ostatnie aktualizacje", "Pobranie informacji o statusie ostatnich aktualizacji systemowych.");
-   this->updateTests.push_back(update1);
    Test* update2 = new Test("Konfiguracja", "Sprawdzenie, czy system jest skonfigurowany do automatycznego pobierania i instalowania aktualizacji.");
    this->updateTests.push_back(update2);
-   Test* update3 = new Test("Plan", "Zmiana konfiguracji planu aktualizacji (np. harmonogram instalacji aktualizacji).");
-   this->updateTests.push_back(update3);
 
    // Access
-   Test* access1 = new Test("Dostep", "Sprawdzenie listy uzytkownikow lub grup, ktore maja dostep do okreslonych plikow lub folderow.");
+   Test* access1 = new Test("Dostep", "Sprawdzenie czy uzytkownik ma dostep do okreslonych plikow lub folderow. W tym przypadku caly folder Windows");
    this->accessTests.push_back(access1);
-   Test* access2 = new Test("Zmiana uprawnien", "Zmiana uprawnien dostepu do wybranych plikow/folderow dla okreslonych uzytkownikow.");
+   Test* access2 = new Test("Zmiana uprawnien", "Sprawdzenie czy uzytkownik ma dostep do zmiany uprawnien dostepu do wybranych plikow/folderow dla okreslonych uzytkownikow.");
    this->accessTests.push_back(access2);
-   Test* access3 = new Test("ACL", "Sprawdzenie konfiguracji ACL (Access Control List) dla wybranych zasobow systemowych.");
-   this->accessTests.push_back(access3);
+
+   // Disc
+   Test* disc1 = new Test("Szyfrowanie", "Sprawdzenie czy dysk jest szyfrowany za pomoca BitLocker'a");
+   this->discTest.push_back(disc1);
 
    this->allTests.push_back(passwordTests);
-   this->allTests.push_back(accountTests);
    this->allTests.push_back(firewallTests);
    this->allTests.push_back(eventsTests);
    this->allTests.push_back(servicesTests);
    this->allTests.push_back(updateTests);
    this->allTests.push_back(accessTests);
+   this->allTests.push_back(discTest);
 }
 
 void MainWindow::ResetTestTree()
@@ -212,10 +190,32 @@ void MainWindow::StartTest()
    bool overall = true;
 
    //HASLO 1
-   size_t siema = 0;
    this->allTests[0][0]->GetMinimumPasswordLength();
 
    //HASLO 2
+   this->allTests[0][1]->GetPasswordExpiredTime();
+
+   // FIREWALL 1
+   this->allTests[0][0]->CheckFirewall();
+
+   // REGISTER 1
+   this->allTests[0][0]->CheckRegistryWrite();
+
+   // SERVICES 1
+   this->allTests[0][0]->CheckServices();
+
+   // SERVICES 2
+   this->allTests[0][0]->CheckServiceTriggerStartPermissions();
+
+   // UPDATE 1
+   this->allTests[0][0]->CheckIfUpdateIsAutomat();
+
+   // ACCESS
+   this->allTests[0][0]->CheckFolderAccess();
+
+   // ACCESS 2
+   this->allTests[0][0]->CheckFolderPermissions();
+
 
 
 
