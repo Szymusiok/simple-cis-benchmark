@@ -20,6 +20,7 @@ public:
    std::string GetDescription();
    void Clear();
 
+
 private:
    std::string name;
    std::string description;

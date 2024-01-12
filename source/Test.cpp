@@ -28,5 +28,5 @@ std::string Test::GetDescription()
 
 void Test::Clear()
 {  
-   this->result = Result::Failed;
+   this->result = Result::Unknown;
 }

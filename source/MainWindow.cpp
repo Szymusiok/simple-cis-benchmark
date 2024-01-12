@@ -195,7 +195,7 @@ void MainWindow::SetResultText()
    }
 
    resultText += std::to_string(points) + "/" + std::to_string(maxPoints);
-   resultText += "               Percent: ";
+   resultText += "\nPercent: ";
 
    this->ui.resultText->append(resultText.c_str());
 
@@ -208,9 +208,14 @@ void MainWindow::StartTest()
 {
    this->ResetTestTree();
 
-   //tutaj cale testy w jakiejs funkcji
+   // TESTY NA SUCHO
+
+
+
+   // KONIEC TESTOW NA SUCHO
 
    this->SetResultText();
    this->BuildTestTree();
 
+   this->ui.testTree->expandAll();
 }
