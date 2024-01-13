@@ -29,12 +29,14 @@ private:
    Ui::MainWindow ui;
 
    std::vector<Test*> passwordTests;
+   std::vector<Test*> auditTests;
    std::vector<Test*> firewallTests;
    std::vector<Test*> eventsTests;
    std::vector<Test*> servicesTests;
    std::vector<Test*> updateTests;
    std::vector<Test*> accessTests;
-   std::vector<Test*> discTest;
+   std::vector<Test*> discTests;
+   std::vector<Test*> backupTests;
 
    std::vector<std::vector<Test* >> allTests;
 

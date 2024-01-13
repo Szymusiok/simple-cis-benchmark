@@ -36,7 +36,7 @@ void MainWindow::BuildTestTree()
    font.setPointSize(13);
    this->ui.testTree->header()->setFont(font);
 
-   std::vector < std::string> testNames{ "Haslo","Firewall","Rejestr","Serwisy","Aktualizacja","Dostep","Dysk" };
+   std::vector < std::string> testNames{ "Haslo","Audyt","Firewall","Rejestr","Serwisy","Aktualizacja","Dostep","Dysk","Backup"};
    int points{}, maxPoints{};
 
    for (int i = 0; i < this->allTests.size(); i++)
@@ -97,6 +97,19 @@ void MainWindow::ManageTest()
       });
    this->passwordTests.push_back(password3);
 
+   // Audit
+   Test* audit1 = new Test("Ustawienia", "Sprawdzenie czy ustawienia audytu sa skonfigurowane wedlug rekomendacji", [] ()
+      {
+         return TestSuite::IsAuditConfigured();
+      });
+   this->auditTests.push_back(audit1);
+
+   Test* audit2 = new Test("Krytyczne wydarzenia", "Sprawdzenie czy audyt jest wlaczony dla krytycznych systemowych wydarzen", [] ()
+      {
+         return TestSuite::IsAuditingEnabledForCriticalEvents();
+      });
+   this->auditTests.push_back(audit2);
+
    // Firewall
    Test* firewall3 = new Test("Stan", "Pobranie informacji o aktualnym stanie zapory sieciowej (wlaczona/wylaczona).", [] ()
       {
@@ -147,15 +160,24 @@ void MainWindow::ManageTest()
       {
          return TestSuite::CheckBitLocker();
       });
-   this->discTest.push_back(disc1);
+   this->discTests.push_back(disc1);
+
+   // Backup
+   Test* backup1 = new Test("Backup", "Sprawdzenie czy sa robione regularne backupy i moga byc odtworzone z sukcesem", [] ()
+      {
+         return TestSuite::IsBackupAndRestoreConfigured();
+      });
+   this->backupTests.push_back(backup1);
 
    this->allTests.push_back(passwordTests);
+   this->allTests.push_back(auditTests);
    this->allTests.push_back(firewallTests);
    this->allTests.push_back(eventsTests);
    this->allTests.push_back(servicesTests);
    this->allTests.push_back(updateTests);
    this->allTests.push_back(accessTests);
-   this->allTests.push_back(discTest);
+   this->allTests.push_back(discTests);
+   this->allTests.push_back(backupTests);
 }
 
 void MainWindow::ResetTestTree()
@@ -210,12 +232,15 @@ void MainWindow::SetResultText()
 
    resultText = std::to_string(percent);
    QString result = QString::number(percent, 'f', 2).arg('%');
+   result += '%';
    this->ui.resultText->insertPlainText(result);
 }
 
 void MainWindow::StartTest()
 {
    this->ResetTestTree();
+
+   TestSuite::IsAuditingEnabledForCriticalEvents();
 
    for (std::vector<Test*> tests : this->allTests)
    {

@@ -12,5 +12,8 @@ public:
    static bool CheckFolderAccess();
    static bool CheckFolderPermissions();
    static bool CheckBitLocker();
+   static bool IsAuditConfigured();
+   static bool IsAuditingEnabledForCriticalEvents();
+   static bool IsBackupAndRestoreConfigured();
 };
 

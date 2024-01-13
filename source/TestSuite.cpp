@@ -9,6 +9,17 @@
 #include <sddl.h>
 #include <winsvc.h>
 #include <aclapi.h>
+#include <Windows.h>
+#include <ntsecapi.h>  // Include the header for LSA functions
+#include <ntstatus.h>  // Include the header for NTSTATUS codes
+
+#ifndef POLICY_AUDIT_EVENT_SUCCESS
+#define POLICY_AUDIT_EVENT_SUCCESS 0x0001
+#endif
+
+#ifndef POLICY_AUDIT_EVENT_FAILURE
+#define POLICY_AUDIT_EVENT_FAILURE 0x0002
+#endif
 
 #pragma comment(lib, "Netapi32.lib")
 
@@ -412,4 +423,158 @@ bool TestSuite::CheckBitLocker()
    }
 
    return true;
+}
+
+bool TestSuite::IsAuditConfigured()
+{
+   bool result = true;
+
+   // Define the expected audit policy values based on CIS recommendations.
+   // Modify these values according to your specific CIS benchmark.
+   DWORD expectedAuditPolicy = POLICY_AUDIT_EVENT_SUCCESS | POLICY_AUDIT_EVENT_FAILURE;
+
+   LSA_OBJECT_ATTRIBUTES ObjectAttributes;
+   LSA_HANDLE PolicyHandle;
+
+   // Initialize the ObjectAttributes structure.
+   ZeroMemory(&ObjectAttributes, sizeof(ObjectAttributes));
+
+   // Open the local LSA policy.
+   NTSTATUS status = LsaOpenPolicy(NULL, &ObjectAttributes, POLICY_VIEW_AUDIT_INFORMATION, &PolicyHandle);
+   if (status != STATUS_SUCCESS)
+   {
+      DWORD winError = LsaNtStatusToWinError(status);
+      std::cerr << "Failed to open LSA policy. Error code: 0x" << std::hex << status << std::dec << std::endl;
+      return false;
+   }
+
+   // Query the audit policy.
+   POLICY_AUDIT_EVENTS_INFO* auditPolicyInfo = NULL;
+   status = LsaQueryInformationPolicy(PolicyHandle, PolicyAuditEventsInformation, (PVOID*)&auditPolicyInfo);
+   if (status != STATUS_SUCCESS)
+   {
+      std::cerr << "Failed to query audit policy. Error code: 0x" << std::hex << status << std::dec << std::endl;
+      result = false;
+   }
+   else
+   {
+      if (auditPolicyInfo->AuditingMode != expectedAuditPolicy)
+      {
+         std::cerr << "Audit settings do not match CIS recommendations." << std::endl;
+         result = false;
+      }
+      else
+      {
+         std::cout << "Audit settings are configured according to CIS recommendations." << std::endl;
+      }
+
+      // Free the memory allocated for audit policy info.
+      LsaFreeMemory(auditPolicyInfo);
+   }
+
+   // Close the LSA policy handle.
+   LsaClose(PolicyHandle);
+
+   return result;
+}
+
+bool TestSuite::IsAuditingEnabledForCriticalEvents()
+{
+   bool result = false;
+
+   // Define the expected audit policy values for critical events based on CIS recommendations.
+   // Modify these values according to your specific CIS benchmark.
+   DWORD expectedAuditPolicy = POLICY_AUDIT_EVENT_SUCCESS | POLICY_AUDIT_EVENT_FAILURE;
+
+   LSA_OBJECT_ATTRIBUTES ObjectAttributes;
+   LSA_HANDLE PolicyHandle = NULL;
+   PPOLICY_AUDIT_EVENTS_INFO auditPolicyInfo = NULL;
+
+   // Initialize the ObjectAttributes structure.
+   ZeroMemory(&ObjectAttributes, sizeof(ObjectAttributes));
+
+   // Open the local LSA policy.
+   NTSTATUS status = LsaOpenPolicy(NULL, &ObjectAttributes, POLICY_VIEW_AUDIT_INFORMATION, &PolicyHandle);
+   if (status != STATUS_SUCCESS)
+   {
+      std::cerr << "Failed to open LSA policy. NTSTATUS code: 0x" << std::hex << status << std::dec << std::endl;
+      return false;
+   }
+
+   // Query the audit policy.
+   status = LsaQueryInformationPolicy(PolicyHandle, PolicyAuditEventsInformation, (PVOID*)&auditPolicyInfo);
+   if (status != STATUS_SUCCESS)
+   {
+      std::cerr << "Failed to query audit policy. NTSTATUS code: 0x" << std::hex << status << std::dec << std::endl;
+   }
+   else
+   {
+      if ((auditPolicyInfo->AuditingMode & expectedAuditPolicy) == expectedAuditPolicy)
+      {
+         std::cout << "Auditing is enabled for critical system events according to CIS recommendations." << std::endl;
+         result = true;
+      }
+      else
+      {
+         std::cout << "Auditing is not enabled for critical system events." << std::endl;
+      }
+
+      // Free the memory allocated for audit policy info.
+      LsaFreeMemory(auditPolicyInfo);
+   }
+
+   // Close the LSA policy handle.
+   LsaClose(PolicyHandle);
+
+   return result;
+}
+
+bool TestSuite::IsBackupAndRestoreConfigured()
+{
+   bool backupExists = false;
+   bool restorationSuccessful = false;
+
+   // Define the path to the directory where backup files are expected.
+   // Modify this path according to your specific configuration.
+   std::string backupDirectory = "C:\\BackupDirectory";
+
+   // Check if the backup directory exists.
+   DWORD attributes = GetFileAttributesA(backupDirectory.c_str());
+   if (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY))
+   {
+      backupExists = true;
+      std::cout << "Backup directory exists: " << backupDirectory << std::endl;
+   }
+   else
+   {
+      std::cerr << "Backup directory does not exist: " << backupDirectory << std::endl;
+   }
+
+   // Perform a sample restoration operation (you should adapt this part).
+   // This example assumes that a text file named "restore_test.txt" is part of the backup.
+   // Modify the restoration process based on your backup strategy.
+   std::string filePathToRestore = backupDirectory + "\\restore_test.txt";
+
+   // Attempt to restore the file and check if it exists after restoration.
+   if (CopyFileA(filePathToRestore.c_str(), "C:\\RestoredFile.txt", FALSE))
+   {
+      restorationSuccessful = true;
+      std::cout << "Restoration successful." << std::endl;
+   }
+   else
+   {
+      std::cerr << "Restoration failed." << std::endl;
+   }
+
+   // Report the overall result.
+   if (backupExists && restorationSuccessful)
+   {
+      std::cout << "Regular backups are performed and can be restored successfully." << std::endl;
+      return true;
+   }
+   else
+   {
+      std::cerr << "Regular backups are not performed or cannot be restored successfully." << std::endl;
+      return false;
+   }
 }
